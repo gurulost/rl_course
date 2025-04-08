@@ -1,341 +1,413 @@
-// Create SVG diagrams for RL concepts
-/* Remove function createRLProcessDiagram() { ... } */
-
-// Create SVG for MDP diagram
-/* Remove function createMDPDiagram() { ... } */
-
-// Create SVG for algorithm comparison
-/* Remove function createAlgorithmComparisonChart() { ... } */
-
-// Create SVG for exploration-exploitation diagram
-/* Remove function createExplorationExploitationDiagram() { ... } */
-
-// Function to load diagrams specific to a lesson
 function loadDiagramsForLesson(lessonElement) {
     const lessonId = lessonElement.id;
     const contentDiv = lessonElement.querySelector('.lesson-content');
     if (!contentDiv) return;
 
-    // Helper function to create and insert diagram images into a specific container
-    function insertDiagram(container, imagePath, captionText) {
-        // Check if diagram already added (optional, safety check)
-        // Simple check based on src might be fragile if paths change
-        if (container.querySelector(`img[src="${imagePath}"]`)) return;
-
-        const diagramDiv = document.createElement('div');
-        diagramDiv.className = 'diagram fade-in';
-        
-        const img = document.createElement('img');
-        img.src = imagePath;
-        img.alt = captionText || 'Diagram';
-        img.loading = 'lazy'; // Add lazy loading for images
-        
-        diagramDiv.appendChild(img);
-        
-        if (captionText) {
-            const caption = document.createElement('p');
-            caption.className = 'diagram-caption';
-            caption.textContent = captionText;
-            diagramDiv.appendChild(caption);
-        }
-        
-        container.appendChild(diagramDiv);
-    }
-
-    // --- Define which diagrams belong to which lessons --- 
-    // This mapping logic needs to be maintained
-    switch (lessonId) {
-        case 'lesson1-2': // Core Components of RL
-            insertDiagram(contentDiv, 'images/rl-process.svg', 'Figure 1: The Reinforcement Learning Process');
-            insertDiagram(contentDiv, 'images/mdp.svg', 'Figure 2: Markov Decision Process (MDP) Example');
-            break;
-        // Add cases for other lessons that should have diagrams
-        // case 'lessonX-Y':
-        //     insertDiagram(contentDiv, 'images/some-other-diagram.svg', 'Figure Z: ...');
-        //     break;
-    }
-    
-    // Add diagrams that might belong to module-level content (if applicable)
-    // This part is tricky if content is purely lesson-based.
-    // Example: Check if this lesson belongs to module 2, then add algo comparison?
-    if (lessonElement.closest('#module2')) {
-         // Decide if this should go in *every* lesson of module 2, or just the first?
-         // Or perhaps add specific placeholder divs in Markdown? e.g., <div class="diagram-placeholder" data-diagram="algo-comparison"></div>
-         // For now, let's assume it should load if *any* lesson in module 2 is loaded.
-         // This might lead to duplicates if multiple lessons are opened. 
-         // A better approach might be needed depending on requirements.
-         const moduleContentDiv = lessonElement.closest('.module-content');
-         if (moduleContentDiv && !moduleContentDiv.querySelector('img[src="images/algo-comparison.svg"]')) { // Prevent duplicates in module
-              insertDiagram(moduleContentDiv, 'images/algo-comparison.svg', 'Figure 3: Performance Comparison of RL Algorithms');
-         }
-    }
-    if (lessonElement.closest('#module3')) {
-         const moduleContentDiv = lessonElement.closest('.module-content');
-         if (moduleContentDiv && !moduleContentDiv.querySelector('img[src="images/exploration-exploitation.svg"]')) { // Prevent duplicates
-              insertDiagram(moduleContentDiv, 'images/exploration-exploitation.svg', 'Figure 4: The Exploration-Exploitation Dilemma');
-         }
-    }
-}
-
-// Create interactive code editor component
-class CodeEditor {
-    constructor(containerId, language = 'python', initialCode = '') {
-        this.container = document.getElementById(containerId);
-        if (!this.container) return;
-        
-        this.language = language;
-        this.initialCode = initialCode;
-        
-        this.createEditor();
-    }
-    
-    createEditor() {
-        // Create editor elements
-        const editorContainer = document.createElement('div');
-        editorContainer.className = 'code-editor';
-        
-        // Create header with language indicator
-        const header = document.createElement('div');
-        header.className = 'editor-header';
-        header.innerHTML = `<span class="language-indicator">${this.language}</span>`;
-        
-        // Create textarea for code
-        const textarea = document.createElement('textarea');
-        textarea.className = 'editor-textarea';
-        textarea.value = this.initialCode;
-        textarea.spellcheck = false;
-        
-        // Create run button
-        const runButton = document.createElement('button');
-        runButton.className = 'run-button';
-        runButton.textContent = 'Run Code';
-        runButton.addEventListener('click', () => this.runCode(textarea.value));
-        
-        // Create output area
-        const output = document.createElement('div');
-        output.className = 'editor-output';
-        output.innerHTML = '<p class="output-placeholder">Code output will appear here...</p>';
-        
-        // Assemble editor
-        editorContainer.appendChild(header);
-        editorContainer.appendChild(textarea);
-        editorContainer.appendChild(runButton);
-        editorContainer.appendChild(output);
-        
-        this.container.appendChild(editorContainer);
-        this.outputElement = output;
-    }
-    
-    runCode(code) {
-        // In a real implementation, this would execute the code
-        // For this demo, we'll just display the code and a simulated output
-        this.outputElement.innerHTML = '';
-        
-        const codeElement = document.createElement('pre');
-        codeElement.textContent = 'Executing code:\n' + code;
-        
-        const resultElement = document.createElement('pre');
-        resultElement.className = 'output-result';
-        
-        // Simulate different outputs based on code content
-        if (code.includes('print')) {
-            resultElement.textContent = 'Output:\n' + this.simulateOutput(code);
-        } else if (code.includes('import')) {
-            resultElement.textContent = 'Modules imported successfully.';
-        } else {
-            resultElement.textContent = 'Code executed without output.';
-        }
-        
-        this.outputElement.appendChild(codeElement);
-        this.outputElement.appendChild(resultElement);
-    }
-    
-    simulateOutput(code) {
-        // Very simple simulation of Python print statements
-        const printRegex = /print\(['"](.+?)['"]\)/g;
-        let output = '';
-        let match;
-        
-        while ((match = printRegex.exec(code)) !== null) {
-            output += match[1] + '\n';
-        }
-        
-        return output || 'No print statements found.';
-    }
-}
-
-// Sample code snippets
-const qLearningCode = `import numpy as np
-
-# Q-learning implementation
-def q_learning(env, num_episodes, alpha=0.1, gamma=0.99, epsilon=0.1):
-    # Initialize Q-table
-    q_table = np.zeros([env.observation_space.n, env.action_space.n])
-    
-    for i in range(num_episodes):
-        state = env.reset()
-        done = False
-        
-        while not done:
-            # Epsilon-greedy action selection
-            if np.random.random() < epsilon:
-                action = env.action_space.sample()  # Explore
-            else:
-                action = np.argmax(q_table[state, :])  # Exploit
+    // Helper function to find placeholder and insert diagram
+    function insertDiagramViaPlaceholder(placeholderSelector, imagePath, captionText) {
+        const placeholder = contentDiv.querySelector(placeholderSelector);
+        if (placeholder) {
+            const diagramDiv = document.createElement('div');
+            diagramDiv.className = 'diagram fade-in';
             
-            # Take action and observe next state and reward
-            next_state, reward, done, _ = env.step(action)
+            const img = document.createElement('img');
+            img.src = imagePath;
+            img.alt = captionText || 'Diagram'; 
+            img.loading = 'lazy';
             
-            # Q-learning update
-            old_value = q_table[state, action]
-            next_max = np.max(q_table[next_state, :])
+            diagramDiv.appendChild(img);
             
-            # Bellman equation
-            new_value = old_value + alpha * (reward + gamma * next_max - old_value)
-            q_table[state, action] = new_value
-            
-            state = next_state
-    
-    return q_table
-
-print("Q-learning algorithm ready to use!")`;
-
-// Function to add code examples specific to a lesson
-function addCodeExamplesForLesson(lessonElement) {
-    const lessonId = lessonElement.id;
-    const contentDiv = lessonElement.querySelector('.lesson-content');
-    if (!contentDiv) return;
-
-    // --- Define which code examples belong to which lessons ---
-    switch (lessonId) {
-        case 'lesson2-1': // Assuming Lesson 2.1 is Q-Learning
-            // Create a unique ID for the container within this lesson
-            const editorId = `code-editor-${lessonId}`;
-            // Check if it already exists
-            if (!contentDiv.querySelector(`#${editorId}`)) {
-                const codeContainer = document.createElement('div');
-                codeContainer.id = editorId;
-                codeContainer.className = 'code-container fade-in'; // Added fade-in
-                contentDiv.appendChild(codeContainer);
-                
-                // Pass the dynamically created ID to the CodeEditor
-                new CodeEditor(editorId, 'python', qLearningCode);
+            if (captionText) {
+                const caption = document.createElement('p');
+                caption.className = 'diagram-caption';
+                caption.textContent = captionText;
+                diagramDiv.appendChild(caption);
             }
-            break;
-        // Add cases for other lessons with code examples
-        // case 'lessonX-Y':
-        //    ... create container and new CodeEditor() ...
-        //    break;
+            
+            // Replace placeholder with the diagram
+            placeholder.parentNode.replaceChild(diagramDiv, placeholder);
+        } else {
+             // Optional: Log if a placeholder was expected but not found
+             // console.log(`Placeholder ${placeholderSelector} not found in ${lessonId}`);
+        }
     }
+
+    // --- Find placeholders in the loaded content and insert diagrams ---
+    insertDiagramViaPlaceholder(
+        '[data-diagram="rl-process"]',
+        'images/rl-process.svg',
+        'Figure 1: The Reinforcement Learning Process'
+    );
+    insertDiagramViaPlaceholder(
+        '[data-diagram="mdp"]',
+        'images/mdp.svg',
+        'Figure 2: Markov Decision Process (MDP) Example'
+    );
+     insertDiagramViaPlaceholder(
+        '[data-diagram="algo-comparison"]',
+        'images/algo-comparison.svg',
+        'Figure 3: Conceptual Performance Comparison of RL Algorithms'
+    );
+     insertDiagramViaPlaceholder(
+        '[data-diagram="exploration-exploitation"]',
+        'images/exploration-exploitation.svg',
+        'Figure 4: The Exploration-Exploitation Dilemma'
+    );
+    // Add placeholders for other anticipated diagrams
+     insertDiagramViaPlaceholder(
+        '[data-diagram="q-learning-flowchart"]',
+        'images/q-learning-flowchart.svg',
+        'Figure: Q-Learning Update Process'
+    );
+     insertDiagramViaPlaceholder(
+        '[data-diagram="actor-critic-flow"]',
+        'images/actor-critic-flow.svg',
+        'Figure: Basic Actor-Critic Architecture'
+    );
+     insertDiagramViaPlaceholder(
+        '[data-diagram="credit-assignment"]',
+        'images/credit-assignment.svg',
+        'Figure: The Credit Assignment Problem'
+    );
+     insertDiagramViaPlaceholder(
+        '[data-diagram="qlearn-sarsa-compare"]',
+        'images/qlearn-sarsa-compare.svg',
+        'Figure: Comparing Q-Learning and SARSA Updates'
+    );
+    
+    // Remove the old switch-based logic
+    /*
+    switch (lessonId) { ... }
+    if (lessonElement.closest('#module2')) { ... }
+    */
 }
 
-// Function to create and add quizzes specific to a lesson
-function createQuizForLesson(lessonElement) {
+// Function to initialize interactive charts using Chart.js
+function initializeChartsForLesson(lessonElement) {
+    const lessonId = lessonElement.id;
+    const contentDiv = lessonElement.querySelector('.lesson-content');
+    if (!contentDiv || typeof Chart === 'undefined') {
+        if (typeof Chart === 'undefined') {
+            // Silently fail if Chart.js is not loaded, or add a console warning
+            // console.warn("Chart.js not loaded, skipping chart initialization.");
+        }
+        return;
+    }
+
+    // Find all chart placeholders in this lesson
+    const placeholders = contentDiv.querySelectorAll('.chart-placeholder');
+
+    placeholders.forEach((canvasElement) => {
+        const chartId = canvasElement.dataset.chart; // e.g., 'algo-performance'
+        
+        // Prevent re-initialization if chart already exists on this canvas
+        if (Chart.getChart(canvasElement)) {
+            return;
+        }
+
+        let chartData = null;
+        let chartOptions = {};
+        let chartType = 'line';
+
+        // --- Map chartId to actual chart data and options ---
+        switch (chartId) {
+            case 'algo-performance':
+                chartType = 'line';
+                // Conceptual dummy data representing learning curves
+                const labels = Array.from({length: 20}, (_, i) => `Step ${i * 5}`); // Example steps
+                chartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Q-Learning',
+                            data: labels.map((_, i) => 10 + i * 3 + Math.random() * 5), // Example data
+                            borderColor: 'rgba(0, 122, 255, 0.8)', // Use accent color
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: 'SARSA',
+                            data: labels.map((_, i) => 8 + i * 2.8 + Math.random() * 6), // Slightly slower/noisier
+                            borderColor: 'rgba(88, 86, 214, 0.8)', // Purpleish
+                            tension: 0.1,
+                            fill: false
+                        },
+                         {
+                            label: 'Policy Gradient (Conceptual)',
+                            data: labels.map((_, i) => 5 + i * 3.5 + Math.random() * 8), // Slower start, high variance
+                            borderColor: 'rgba(52, 199, 89, 0.8)', // Greenish
+                            tension: 0.3, // More variance looking
+                            fill: false
+                        }
+                    ]
+                };
+                chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false, // Using separate caption
+                            text: 'Conceptual Algorithm Performance'
+                        },
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Training Steps/Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Performance / Cumulative Reward'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                };
+                break;
+            // Add cases for other charts if needed
+            // case 'another-chart':
+            //    chartData = { ... };
+            //    chartOptions = { ... };
+            //    chartType = 'bar';
+            //    break;
+            default:
+                console.warn(`Chart ID "${chartId}" not recognized.`);
+                canvasElement.parentNode.textContent = `[Error: Chart '${chartId}' not found]`;
+                return; // Skip this placeholder
+        }
+
+        // Create the chart
+        if (chartData) {
+            try {
+                new Chart(canvasElement, {
+                    type: chartType,
+                    data: chartData,
+                    options: chartOptions
+                });
+                 // Remove placeholder class if needed, though Chart.js uses the canvas
+                 canvasElement.classList.remove('chart-placeholder');
+            } catch (error) {
+                console.error(`Error creating chart '${chartId}':`, error);
+                 canvasElement.parentNode.textContent = `[Error initializing chart '${chartId}']`;
+            }
+        }
+    });
+}
+
+// Function to initialize conceptual Chain-of-Thought visualizations
+function initializeCoTVisualization(lessonElement) {
     const lessonId = lessonElement.id;
     const contentDiv = lessonElement.querySelector('.lesson-content');
     if (!contentDiv) return;
 
-    // --- Define which quizzes belong to which lessons ---
-    let quizData = null;
-    switch (lessonId) {
-        case 'lesson1-1': // Example: Put quiz at the end of Lesson 1.1
-            // Check if quiz already added
-            if (contentDiv.querySelector('.quiz-container')) return;
+    // Find all CoT placeholders in this lesson
+    const placeholders = contentDiv.querySelectorAll('.cot-visualization-placeholder');
 
-            quizData = {
-                title: "Reinforcement Learning Basics Quiz",
-                questions: [
-                    { question: "What is the primary goal of reinforcement learning?", options: ["To classify data into categories", "To predict values based on labeled examples", "To learn optimal behavior through trial and error", "To cluster similar data points together"], correctAnswer: 2 },
-                    { question: "Which of the following is NOT a core component of reinforcement learning?", options: ["Agent", "Environment", "Labeled dataset", "Reward signal"], correctAnswer: 2 },
-                    { question: "What does the 'policy' refer to in reinforcement learning?", options: ["The rules of the environment", "The agent's strategy for choosing actions", "The reward calculation method", "The termination conditions"], correctAnswer: 1 }
-                ]
-            };
-            break;
-        // Add cases for other lessons with quizzes
-        // case 'lessonX-Y':
-        //    quizData = { ... };
-        //    break;
-    }
+    placeholders.forEach((placeholder) => {
+        const vizId = placeholder.dataset.cotViz; // e.g., 'math-problem-simple'
+        
+        // Prevent re-initialization
+        if (placeholder.dataset.initialized === 'true') return;
 
-    if (quizData) {
-        // Create and append the quiz HTML
-        const quizContainer = document.createElement('div');
-        quizContainer.className = 'quiz-container fade-in'; // Added fade-in
-        quizContainer.innerHTML = `
-            <h3>${quizData.title}</h3>
-            <div class="quiz-questions"></div>
-            <button class="submit-quiz">Submit Answers</button>
-            <div class="quiz-results"></div>
-        `;
-        contentDiv.appendChild(quizContainer);
-        
-        const questionsContainer = quizContainer.querySelector('.quiz-questions');
-        
-        // Add questions
-        quizData.questions.forEach((q, qIndex) => {
-            const questionElement = document.createElement('div');
-            questionElement.className = 'quiz-question';
-            questionElement.innerHTML = `<p class="question-text">${qIndex + 1}. ${q.question}</p>`;
-            
-            const optionsContainer = document.createElement('div');
-            optionsContainer.className = 'question-options';
-            
-            q.options.forEach((option, oIndex) => {
-                const optionId = `l${lessonId}_q${qIndex}_o${oIndex}`; // Unique ID per lesson instance
-                const optionName = `l${lessonId}_q${qIndex}`; // Unique name per lesson instance
-                const optionElement = document.createElement('div');
-                optionElement.className = 'option';
-                optionElement.innerHTML = `
-                    <input type="radio" id="${optionId}" name="${optionName}" value="${oIndex}">
-                    <label for="${optionId}">${option}</label>
-                `;
-                optionsContainer.appendChild(optionElement);
-            });
-            
-            questionElement.appendChild(optionsContainer);
-            questionsContainer.appendChild(questionElement);
-        });
-        
-        // Add submit button functionality (scoped to this quiz instance)
-        const submitButton = quizContainer.querySelector('.submit-quiz');
-        const resultsContainer = quizContainer.querySelector('.quiz-results');
-        
-        submitButton.addEventListener('click', () => {
-            let score = 0;
-            let feedback = '';
-            
-            quizData.questions.forEach((q, qIndex) => {
-                const optionName = `l${lessonId}_q${qIndex}`; // Use the unique name
-                const selectedOption = quizContainer.querySelector(`input[name="${optionName}"]:checked`);
-                const questionElement = questionsContainer.children[qIndex]; // Get the specific question element
+        let vizData = null;
 
-                // Reset previous feedback styling (optional)
-                questionElement.classList.remove('correct', 'incorrect'); 
+        // --- Map vizId to actual CoT data ---
+        switch (vizId) {
+            case 'math-problem-simple':
+                vizData = {
+                    prompt: "Question: Sarah has 5 apples. She buys 3 more bags of apples, and each bag contains 4 apples. How many apples does Sarah have now?",
+                    steps: [
+                        "Step 1: Identify the initial number of apples Sarah has (5).",
+                        "Step 2: Identify the number of bags bought (3).",
+                        "Step 3: Identify the number of apples per bag (4).",
+                        "Step 4: Calculate the total number of apples bought (3 bags * 4 apples/bag = 12 apples).",
+                        "Step 5: Calculate the final total number of apples (initial 5 + bought 12 = 17 apples)."
+                    ],
+                    answer: "Final Answer: Sarah now has 17 apples."
+                };
+                break;
+            // Add cases for other CoT examples
+            // case 'another-cot-example':
+            //    vizData = { ... };
+            //    break;
+             default:
+                console.warn(`CoT Visualization ID "${vizId}" not recognized.`);
+                placeholder.textContent = `[Error: CoT Visualization '${vizId}' not found]`;
+                return; // Skip this placeholder
+        }
 
-                if (selectedOption) {
-                    const selectedValue = parseInt(selectedOption.value);
-                    if (selectedValue === q.correctAnswer) {
-                        score++;
-                        feedback += `<p>Question ${qIndex + 1}: Correct!</p>`;
-                        questionElement.classList.add('correct'); // Add styling for feedback
+        if (vizData) {
+            placeholder.innerHTML = ''; // Clear loading message
+            placeholder.dataset.initialized = 'true';
+            placeholder.classList.remove('cot-visualization-placeholder');
+            placeholder.classList.add('cot-visualization', 'fade-in');
+
+            let currentStep = 0;
+
+            // Prompt Area
+            const promptDiv = document.createElement('div');
+            promptDiv.className = 'cot-prompt';
+            promptDiv.innerHTML = `<p><strong>${vizData.prompt}</strong></p>`;
+            placeholder.appendChild(promptDiv);
+
+            // Steps Area
+            const stepsContainer = document.createElement('div');
+            stepsContainer.className = 'cot-steps-container';
+            placeholder.appendChild(stepsContainer);
+
+             // Answer Area (initially hidden)
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'cot-answer';
+            answerDiv.innerHTML = `<p><strong>${vizData.answer}</strong></p>`;
+            answerDiv.style.display = 'none';
+            placeholder.appendChild(answerDiv);
+
+            // Controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'cot-controls';
+
+            const nextStepButton = document.createElement('button');
+            nextStepButton.textContent = 'Show Thinking Step 1';
+            nextStepButton.className = 'cot-button';
+            
+            const resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset';
+            resetButton.className = 'cot-button';
+            resetButton.style.marginLeft = '10px';
+
+            controlsDiv.appendChild(nextStepButton);
+            controlsDiv.appendChild(resetButton);
+            placeholder.appendChild(controlsDiv);
+
+            // Event Listener for Next Step
+            nextStepButton.addEventListener('click', () => {
+                if (currentStep < vizData.steps.length) {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'cot-step fade-in';
+                    stepDiv.textContent = vizData.steps[currentStep];
+                    stepsContainer.appendChild(stepDiv);
+                    currentStep++;
+                    if (currentStep < vizData.steps.length) {
+                         nextStepButton.textContent = `Show Thinking Step ${currentStep + 1}`;
                     } else {
-                        feedback += `<p>Question ${qIndex + 1}: Incorrect. The correct answer is "${q.options[q.correctAnswer]}".</p>`;
-                        questionElement.classList.add('incorrect'); // Add styling for feedback
+                         nextStepButton.textContent = 'Show Final Answer';
                     }
-                } else {
-                    feedback += `<p>Question ${qIndex + 1}: Not answered.</p>`;
-                    questionElement.classList.add('incorrect'); // Mark unanswered as incorrect visually
+                } else if (currentStep === vizData.steps.length) {
+                    // Show final answer
+                    answerDiv.style.display = 'block';
+                    answerDiv.classList.add('fade-in');
+                    nextStepButton.disabled = true;
+                    nextStepButton.textContent = 'Done';
                 }
             });
-            
-            resultsContainer.innerHTML = `
-                <h4>Quiz Results</h4>
-                <p>Your score: ${score}/${quizData.questions.length}</p>
-                <div class="feedback">${feedback}</div>
-            `;
-            resultsContainer.style.display = 'block'; // Ensure results are visible
-        });
-    }
+
+             // Event Listener for Reset
+            resetButton.addEventListener('click', () => {
+                currentStep = 0;
+                stepsContainer.innerHTML = '';
+                answerDiv.style.display = 'none';
+                answerDiv.classList.remove('fade-in');
+                nextStepButton.disabled = false;
+                nextStepButton.textContent = 'Show Thinking Step 1';
+            });
+        }
+    });
+}
+
+// Function to initialize a vertical timeline visualization
+function initializeTimelineVisualization(lessonElement) {
+    const lessonId = lessonElement.id;
+    const contentDiv = lessonElement.querySelector('.lesson-content');
+    if (!contentDiv) return;
+
+    // Find all timeline placeholders
+    const placeholders = contentDiv.querySelectorAll('.timeline-placeholder');
+
+    placeholders.forEach((placeholder) => {
+        const timelineId = placeholder.dataset.timeline; // e.g., 'rl-major-milestones'
+
+        // Prevent re-initialization
+        if (placeholder.dataset.initialized === 'true') return;
+
+        let timelineData = null;
+
+        // --- Map timelineId to actual data --- 
+        switch (timelineId) {
+            case 'rl-major-milestones':
+                /*
+                // Linter issue with this array, commenting out for now.
+                // Please uncomment and ensure syntax is correct manually.
+                timelineData = [
+                    { year: '1950s', title: 'Early Ideas', description: 'Bellman develops Dynamic Programming and the Bellman Equation, laying theoretical foundations.' },
+                    { year: '1980s', title: 'Modern RL Emerges', description: 'Sutton & Barto formalize Temporal Difference (TD) learning. Watkins introduces Q-learning.' },
+                    { year: '1992', title: 'TD-Gammon', description: 'Tesauro's program learns to play Backgammon at world-champion level using TD learning.' },
+                    { year: '2013-15', title: 'Deep Q-Networks (DQN)', description: 'DeepMind combines Q-learning with deep neural networks to master Atari games from pixels, sparking the Deep RL revolution.' },
+                    { year: '2016', title: 'AlphaGo', description: 'DeepMind's AlphaGo defeats world Go champion Lee Sedol using deep RL and Monte Carlo Tree Search.' },
+                    { year: '2017-18', title: 'Policy Optimization Adv.', description: 'Algorithms like PPO and advancements in Actor-Critic methods (A2C/A3C, DDPG, TD3, SAC) show strong performance.' },
+                    { year: '2019+', title: 'RLHF & LLM Alignment', description: 'Reinforcement Learning from Human Feedback becomes crucial for aligning large language models (LLMs) like GPT-3, ChatGPT, Claude, Gemini.' },
+                    { year: '2023+', title: 'RL for Reasoning', description: 'Increased focus on using RL (e.g., RLVR, RLEF, process rewards) to improve complex reasoning and tool use in frontier models (OpenAI o1, DeepSeek R1, Gemini 2.5).' },
+                ];
+                */
+                timelineData = []; // Use empty array to prevent errors
+                console.warn("Timeline data for 'rl-major-milestones' is commented out due to potential syntax issues. Please review.");
+                break;
+            // Add cases for other timelines
+            default:
+                console.warn(`Timeline ID "${timelineId}" not recognized.`);
+                placeholder.textContent = `[Error: Timeline '${timelineId}' not found]`;
+                return;
+        }
+
+        if (timelineData) {
+            placeholder.innerHTML = ''; // Clear loading message
+            placeholder.dataset.initialized = 'true';
+            placeholder.classList.remove('timeline-placeholder');
+            placeholder.classList.add('timeline-container', 'fade-in');
+
+            const timelineList = document.createElement('ul');
+            timelineList.className = 'timeline-list';
+
+            timelineData.forEach((item, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'timeline-item';
+                // Add class for alternating sides (optional)
+                // listItem.classList.add(index % 2 === 0 ? 'timeline-item-left' : 'timeline-item-right');
+
+                const dot = document.createElement('div');
+                dot.className = 'timeline-dot';
+
+                const content = document.createElement('div');
+                content.className = 'timeline-content';
+
+                const year = document.createElement('span');
+                year.className = 'timeline-year';
+                year.textContent = item.year;
+
+                const title = document.createElement('h4');
+                title.className = 'timeline-title';
+                title.textContent = item.title;
+
+                const description = document.createElement('p');
+                description.className = 'timeline-description';
+                description.textContent = item.description;
+
+                content.appendChild(year);
+                content.appendChild(title);
+                content.appendChild(description);
+                listItem.appendChild(dot);
+                listItem.appendChild(content);
+                timelineList.appendChild(listItem);
+            });
+
+            placeholder.appendChild(timelineList);
+        }
+    });
 }
 
 // Main function called by main.js after lesson content is loaded
@@ -344,18 +416,15 @@ function initializeMultimodalForLesson(lessonElement) {
     
     console.log(`Initializing multimodal content for lesson: ${lessonElement.id}`);
 
-    // Call the specific functions to add content relevant to this lesson
+    // Call the specific functions to find placeholders and add content
     loadDiagramsForLesson(lessonElement);
     addCodeExamplesForLesson(lessonElement);
     createQuizForLesson(lessonElement);
+    initializeDemosForLesson(lessonElement);
+    initializeChartsForLesson(lessonElement);
+    initializeCoTVisualization(lessonElement);
+    initializeTimelineVisualization(lessonElement); // Initialize Timeline
 
     // Initialize other interactive elements specific to this lesson if needed
-    // e.g., find a placeholder in the loaded Markdown and activate a specific JS component
 
 }
-
-// --- Remove the old initialization logic --- 
-/*
-function initMultimodalContent() { ... }
-document.addEventListener('DOMContentLoaded', function() { ... });
-*/

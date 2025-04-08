@@ -115,16 +115,30 @@ function scrollToModule(moduleId) {
 
 // Update progress tracker
 function updateProgress() {
-    const totalModules = document.querySelectorAll('.module').length;
-    const completedModules = document.querySelectorAll('.module.completed').length;
-    const activeModules = document.querySelectorAll('.module.active').length;
-    
-    // Calculate progress percentage (completed modules + half credit for active modules)
-    const progressPercent = Math.round((completedModules + (activeModules * 0.5)) / totalModules * 100);
+    const lessonElements = document.querySelectorAll('.lesson');
+    const totalLessons = lessonElements.length;
+    let loadedLessons = 0;
+
+    lessonElements.forEach(lesson => {
+        const contentDiv = lesson.querySelector('.lesson-content');
+        if (contentDiv && contentDiv.dataset.loaded === 'true') {
+            loadedLessons++;
+        }
+    });
+
+    // Calculate progress percentage based on loaded lessons
+    const progressPercent = totalLessons > 0 ? Math.round((loadedLessons / totalLessons) * 100) : 0;
     
     // Update the progress bar
-    document.querySelector('.progress').style.width = `${progressPercent}%`;
-    document.getElementById('progress-percent').textContent = `${progressPercent}%`;
+    const progressBar = document.querySelector('.progress');
+    const progressText = document.getElementById('progress-percent');
+
+    if (progressBar) {
+        progressBar.style.width = `${progressPercent}%`;
+    }
+    if (progressText) {
+        progressText.textContent = `${progressPercent}%`;
+    }
 }
 
 // Load initial content
@@ -145,29 +159,60 @@ async function loadLessonContent(lessonElement) {
         return;
     }
 
-    // Construct the likely markdown file name (needs refinement based on actual file structure)
-    // Assuming files like 'content/lesson1-1.md', 'content/lesson1-2.md' etc.
-    // Or perhaps map lesson IDs to specific files like 'rl_basics.md' and extract sections?
-    // For now, let's assume a simple mapping (e.g., lesson1-1 -> rl_basics.md section)
-    // This part needs a clear strategy for mapping lesson IDs to content sources.
-    
     // *** Placeholder Mapping Strategy: ***
-    // Let's assume a mapping object exists (this should be defined properly)
-    const lessonContentMap = {
-        'lesson1-1': { file: 'rl_basics.md', section: 'What is Reinforcement Learning?' },
-        'lesson1-2': { file: 'rl_basics.md', section: 'Core Components of RL' },
-        // Add mappings for all other lessons...
-        'lesson2-1': { file: 'algorithms.md', section: 'Q-Learning' }, // Example
+    // Map lesson IDs to the new Markdown file structure.
+    const lessonToFileMap = {
+        'lesson1-1': '1-1-what-is-rl.md',
+        'lesson1-2': '1-2-core-components.md',
+        'lesson1-3': '1-3-rl-process-quiz.md',
+        'lesson1-4': '1-4-interactive-demo.md',
+        'lesson1-5': '1-5-algorithms-overview.md',
+        'lesson1-6': '1-6-challenges.md',
+        'lesson1-7': '1-7-applications.md',
+        'lesson1-8': '1-8-mdp.md',
+        'lesson1-9': '1-9-wrap-up.md',
+        // Module 2
+        'lesson2-1': '1-5-algorithms-overview.md', // Reuse overview from M1 initially
+        'lesson2-2': '2-2-q-learning.md',
+        'lesson2-3': '2-3-sarsa.md',
+        'lesson2-4': '2-4-policy-gradients.md',
+        'lesson2-5': '2-5-actor-critic.md',
+        'lesson2-6': '2-6-algo-quiz.md',
+        // Module 3
+        'lesson3-1': '1-6-challenges.md', // Reuse challenges overview from M1
+        // Module 4
+        'lesson4-1': '4-1-openai-o1.md',
+        'lesson4-2': '4-2-openai-applications.md',
+        // Module 5
+        'lesson5-1': '5-1-deepseek-r1-zero.md',
+        'lesson5-2': '5-2-deepseek-r1-distillation.md',
+        // Module 6
+        'lesson6-1': '6-1-google-gemini.md',
+        'lesson6-2': '6-2-google-performance.md',
+        // Module 7
+        'lesson7-1': '7-1-common-themes.md',
+        'lesson7-2': '7-2-future-directions.md',
+        // Module 8
+        'lesson8-1': '8-1-project-overview.md',
+        'lesson8-2': '8-2-project-setup.md',
+        'lesson8-3': '8-3-project-implementation.md',
+        'lesson8-4': '8-4-project-results-analysis.md',
+        'lesson8-5': '8-5-further-resources.md',
+        'lesson8-6': '8-6-project-quiz.md',
+
+        // Example placeholder for a non-existent lesson
+        // 'lesson9-1': '9-1-does-not-exist.md' 
     };
 
-    const mapping = lessonContentMap[lessonId];
-    if (!mapping) {
+    const fileName = lessonToFileMap[lessonId];
+
+    if (!fileName) {
         contentDiv.innerHTML = '<p>Content mapping not found for this lesson.</p>';
         contentDiv.dataset.loaded = 'true'; // Mark as loaded (even if failed)
         return;
     }
 
-    const filePath = `content/${mapping.file}`;
+    const filePath = `content/${fileName}`;
     
     try {
         const response = await fetch(filePath);
@@ -176,17 +221,22 @@ async function loadLessonContent(lessonElement) {
         }
         const markdown = await response.text();
         
-        // --- Option 1: Load entire file and potentially filter later ---
-        // For simplicity now, let's render the whole file.
-        // In a real scenario, you'd parse the markdown and extract the relevant section
-        // based on mapping.section, or structure your .md files per lesson.
+        // Use marked.js to parse
         if (typeof marked === 'undefined') {
-             contentDiv.innerHTML = '<p>Error: marked.js library not found.</p>';
+             contentDiv.innerHTML = '<p>Error: marked.js library not found. Ensure it is included in index.html.</p>';
+             console.error("marked.js library is missing.");
         } else {
-             contentDiv.innerHTML = marked.parse(markdown); // Use marked.js to parse
+             // Sanitize HTML output from marked.js to prevent XSS if Markdown source is untrusted
+             // Basic sanitization (remove script tags). Use a proper library like DOMPurify for robust sanitization.
+             // const dirtyHtml = marked.parse(markdown);
+             // contentDiv.innerHTML = sanitizeHtml(dirtyHtml); // Assuming sanitizeHtml function exists
+             
+             // For now, assuming trusted Markdown content:
+             contentDiv.innerHTML = marked.parse(markdown); 
         }
        
         contentDiv.dataset.loaded = 'true'; // Mark as loaded successfully
+        contentDiv.classList.add('fade-in'); // Add fade-in animation
         
         // Potentially initialize multimodal elements *after* content is loaded
         // Check if the multimodal initialization function exists before calling
@@ -215,56 +265,115 @@ function showModal(content) {
 class GridWorldDemo {
     constructor(containerId, rows = 5, cols = 5) {
         this.container = document.getElementById(containerId);
+        if (!this.container) {
+            console.error(`GridWorldDemo: Container #${containerId} not found.`);
+            return;
+        }
         this.rows = rows;
         this.cols = cols;
         this.grid = [];
         this.agent = { row: 0, col: 0 };
         this.goal = { row: rows - 1, col: cols - 1 };
-        this.obstacles = [];
+        this.obstacles = []; // Can be populated with {row: r, col: c} objects if needed
         this.isTraining = false;
         this.episodes = 0;
         this.steps = 0;
+        this.trainingSpeed = 100; // Milliseconds per step
+        this.trainingInterval = null;
+        
+        // Q-Learning parameters
+        this.qTable = {}; // Use object as sparse dictionary: key=`${row},${col}`
+        this.actions = ['up', 'right', 'down', 'left'];
+        this.alpha = 0.1; // Learning rate
+        this.gamma = 0.9; // Discount factor
+        this.epsilon = 1.0; // Initial exploration rate
+        this.epsilonDecay = 0.9995;
+        this.minEpsilon = 0.05;
+        // Store initial values separately for reset and tuning
+        this.initialEpsilon = 1.0; 
+        this.initialAlpha = 0.1;
+        this.initialEpsilonDecay = 0.9995;
+        this.maxStepsPerEpisode = 100; // Prevent infinite loops
+        this.stepsInEpisode = 0;
+
+        this.showQValues = false; // Toggle to show Q-values on grid
         
         this.initialize();
     }
+
+    // Helper to get Q-value, defaulting to 0
+    getQValue(stateKey, action) {
+        return this.qTable[`${stateKey}-${action}`] || 0;
+    }
+
+    // Helper to set Q-value
+    setQValue(stateKey, action, value) {
+        this.qTable[`${stateKey}-${action}`] = value;
+    }
     
     initialize() {
+        // Clear previous content if re-initializing
+        this.container.innerHTML = ''; 
+        this.qTable = {}; // Reset Q-table
+        this.episodes = 0;
+        this.steps = 0;
+        this.stepsInEpisode = 0;
+        // Reset parameters to initial/tuned values
+        this.alpha = this.initialAlpha;
+        this.epsilon = this.initialEpsilon;
+        this.epsilonDecay = this.initialEpsilonDecay;
+        
+        if(this.trainingInterval) clearInterval(this.trainingInterval);
+        this.isTraining = false;
+
         // Create grid
         this.createGrid();
-        
+        // Place default obstacles (optional)
+        // this.addObstacle(1, 1);
+        // this.addObstacle(1, 2);
+        // this.addObstacle(2, 2);
+        // this.addObstacle(3, 1);
+
         // Create controls
         this.createControls();
         
         // Initial render
+        this.resetAgent(); // Place agent at start
         this.render();
+    }
+
+    addObstacle(row, col) {
+        if (row >= 0 && row < this.rows && col >= 0 && col < this.cols && !(row === 0 && col === 0) && !(row === this.goal.row && col === this.goal.col)) {
+             if (this.grid[row] && this.grid[row][col]) {
+                this.grid[row][col].isObstacle = true;
+             } 
+             // Also add to obstacle list if needed elsewhere
+             this.obstacles.push({row, col}); 
+        }
     }
     
     createGrid() {
         const gridElement = document.createElement('div');
         gridElement.className = 'grid-world';
-        gridElement.style.display = 'grid';
+        // CSS should handle grid display now
         gridElement.style.gridTemplateColumns = `repeat(${this.cols}, 50px)`;
         gridElement.style.gridTemplateRows = `repeat(${this.rows}, 50px)`;
-        gridElement.style.gap = '2px';
         
         for (let row = 0; row < this.rows; row++) {
             this.grid[row] = [];
             for (let col = 0; col < this.cols; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell';
-                cell.style.width = '50px';
-                cell.style.height = '50px';
-                cell.style.backgroundColor = '#f0f0f0';
-                cell.style.border = '1px solid #ccc';
-                cell.style.display = 'flex';
-                cell.style.justifyContent = 'center';
-                cell.style.alignItems = 'center';
+                // CSS should handle sizing, border, etc.
+                cell.dataset.row = row;
+                cell.dataset.col = col;
                 
                 gridElement.appendChild(cell);
                 this.grid[row][col] = {
                     element: cell,
                     isObstacle: false,
-                    reward: row === this.rows - 1 && col === this.cols - 1 ? 100 : -1
+                    // Assign rewards - high for goal, small negative elsewhere to encourage speed
+                    reward: (row === this.goal.row && col === this.goal.col) ? 10 : -0.1 
                 };
             }
         }
@@ -273,197 +382,426 @@ class GridWorldDemo {
     }
     
     createControls() {
-        const controls = document.createElement('div');
-        controls.className = 'grid-controls';
-        controls.style.marginTop = '20px';
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'grid-controls-container'; // New wrapper
+
+        const mainControls = document.createElement('div');
+        mainControls.className = 'grid-controls';
         
         // Start/Stop button
         const startButton = document.createElement('button');
         startButton.textContent = 'Start Training';
         startButton.className = 'start-button';
-        startButton.style.padding = '8px 16px';
-        startButton.style.marginRight = '10px';
-        startButton.style.backgroundColor = '#4a6baf';
-        startButton.style.color = 'white';
-        startButton.style.border = 'none';
-        startButton.style.borderRadius = '4px';
-        startButton.style.cursor = 'pointer';
-        
-        startButton.addEventListener('click', () => {
-            if (this.isTraining) {
-                this.stopTraining();
-                startButton.textContent = 'Start Training';
-            } else {
-                this.startTraining();
-                startButton.textContent = 'Stop Training';
-            }
-        });
+        startButton.addEventListener('click', () => this.toggleTraining(startButton));
         
         // Reset button
         const resetButton = document.createElement('button');
         resetButton.textContent = 'Reset';
         resetButton.className = 'reset-button';
-        resetButton.style.padding = '8px 16px';
-        resetButton.style.backgroundColor = '#6c757d';
-        resetButton.style.color = 'white';
-        resetButton.style.border = 'none';
-        resetButton.style.borderRadius = '4px';
-        resetButton.style.cursor = 'pointer';
-        
-        resetButton.addEventListener('click', () => {
-            this.reset();
+        resetButton.addEventListener('click', () => this.reset());
+
+        // Speed Control
+        const speedLabel = document.createElement('label');
+        speedLabel.textContent = 'Speed:';
+        speedLabel.style.marginLeft = '15px';
+        const speedSlider = document.createElement('input');
+        speedSlider.type = 'range';
+        speedSlider.min = 10; speedSlider.max = 500; speedSlider.value = this.trainingSpeed;
+        speedSlider.style.marginLeft = '5px';
+        speedSlider.addEventListener('input', (e) => {
+            this.trainingSpeed = 510 - parseInt(e.target.value); // Invert slider: faster on right
+            if (this.isTraining) { this.stopTraining(); this.startTraining(); }
         });
         
+         // Toggle Q-values display
+        const qValueToggle = document.createElement('button');
+        qValueToggle.textContent = 'Show Q-Values';
+        qValueToggle.style.marginLeft = '15px';
+        qValueToggle.addEventListener('click', () => {
+            this.showQValues = !this.showQValues;
+            qValueToggle.textContent = this.showQValues ? 'Hide Q-Values' : 'Show Q-Values';
+            this.render();
+        });
+        
+        mainControls.appendChild(startButton);
+        mainControls.appendChild(resetButton);
+        mainControls.appendChild(speedLabel);
+        mainControls.appendChild(speedSlider);
+        mainControls.appendChild(qValueToggle);
+
+        // --- Parameter Tuning Controls ---
+        const tuningControls = document.createElement('div');
+        tuningControls.className = 'grid-tuning-controls';
+        tuningControls.style.marginTop = '10px';
+        tuningControls.style.display = 'flex';
+        tuningControls.style.flexWrap = 'wrap';
+        tuningControls.style.gap = '10px 20px'; // Row and column gap
+        tuningControls.style.justifyContent = 'center';
+        tuningControls.style.fontSize = '0.9em';
+
+        // Alpha (Learning Rate)
+        const alphaDiv = this.createSliderControl(
+            'alpha-slider', 'Alpha (α):', 0.01, 1.0, 0.01, this.initialAlpha,
+            (value) => { this.initialAlpha = parseFloat(value); this.alpha = this.initialAlpha; } // Update initial and current
+        );
+
+        // Initial Epsilon
+        const epsilonDiv = this.createSliderControl(
+            'epsilon-slider', 'Initial Epsilon (ε):', 0.0, 1.0, 0.01, this.initialEpsilon,
+            (value) => { this.initialEpsilon = parseFloat(value); this.epsilon = this.initialEpsilon; } // Update initial and current
+        );
+        
+        // Epsilon Decay Rate
+        const decayDiv = this.createSliderControl(
+            'decay-slider', 'ε Decay Rate:', 0.99, 1.0, 0.0001, this.initialEpsilonDecay,
+            (value) => { this.initialEpsilonDecay = parseFloat(value); this.epsilonDecay = this.initialEpsilonDecay; }, // Update initial and current decay
+            4 // Number of decimal places for display
+        );
+
+        tuningControls.appendChild(alphaDiv);
+        tuningControls.appendChild(epsilonDiv);
+        tuningControls.appendChild(decayDiv);
+
         // Stats display
         const stats = document.createElement('div');
         stats.className = 'stats';
-        stats.style.marginTop = '10px';
+        stats.style.marginTop = '15px';
         stats.innerHTML = `
-            <p>Episodes: <span id="episodes">0</span></p>
-            <p>Steps: <span id="steps">0</span></p>
-        `;
+            <p>Episodes: <span id="gw-episodes-${this.container.id}">0</span> | Steps: <span id="gw-steps-${this.container.id}">0</span> | Epsilon (current): <span id="gw-epsilon-${this.container.id}">1.00</span></p>
+        `; // Changed label to clarify current epsilon
         
-        controls.appendChild(startButton);
-        controls.appendChild(resetButton);
-        controls.appendChild(stats);
+        controlsContainer.appendChild(mainControls);
+        controlsContainer.appendChild(tuningControls);
+        controlsContainer.appendChild(stats);
+
+        // Append the container with all controls
+        this.container.appendChild(controlsContainer);
+    }
+
+    // Helper to create slider controls
+    createSliderControl(id, labelText, min, max, step, initialValue, onChangeCallback, displayDecimals = 2) {
+        const controlDiv = document.createElement('div');
+        controlDiv.style.display = 'flex';
+        controlDiv.style.alignItems = 'center';
         
-        this.container.appendChild(controls);
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = labelText;
+        label.style.marginRight = '5px';
+        
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.id = id;
+        slider.min = min;
+        slider.max = max;
+        slider.step = step;
+        slider.value = initialValue;
+        slider.style.width = '100px'; // Adjust width as needed
+        
+        const valueSpan = document.createElement('span');
+        valueSpan.textContent = parseFloat(initialValue).toFixed(displayDecimals);
+        valueSpan.style.marginLeft = '5px';
+        valueSpan.style.minWidth = '35px'; // Prevent layout shifts
+        valueSpan.style.display = 'inline-block';
+        valueSpan.style.textAlign = 'right';
+
+        slider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            valueSpan.textContent = parseFloat(value).toFixed(displayDecimals);
+            if (onChangeCallback) {
+                onChangeCallback(value);
+            }
+        });
+
+        controlDiv.appendChild(label);
+        controlDiv.appendChild(slider);
+        controlDiv.appendChild(valueSpan);
+        return controlDiv;
+    }
+
+    toggleTraining(button) {
+         if (this.isTraining) {
+            this.stopTraining();
+            button.textContent = 'Start Training';
+        } else {
+            this.startTraining();
+            button.textContent = 'Stop Training';
+        }
     }
     
     render() {
+        const agentStateKey = `${this.agent.row},${this.agent.col}`;
         // Clear all cells and reset styles
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 const cell = this.grid[row][col];
-                cell.element.innerHTML = ''; // Clear previous content (emoji or img)
-                
-                // Reset background for non-obstacle cells
-                // Relies on CSS for default cell background
-                cell.element.style.backgroundColor = ''; 
+                const cellStateKey = `${row},${col}`;
+                cell.element.innerHTML = ''; // Clear previous content
+                cell.element.style.backgroundColor = ''; // Rely on CSS default
+                cell.element.style.position = 'relative'; // For Q-value display
 
                 if (cell.isObstacle) {
-                    // Use CSS variable or a specific color for obstacles if needed
                     cell.element.style.backgroundColor = 'var(--text-secondary-color)'; 
                 } else if (row === this.goal.row && col === this.goal.col) {
-                    // Set goal icon using img tag
-                    //cell.element.style.backgroundColor = '#28a745'; // Remove background color, rely on icon
                     cell.element.innerHTML = '<img src="images/goal-icon.svg" alt="Goal" style="width: 70%; height: 70%; object-fit: contain;">';
                 } 
-                // Agent is handled separately below to overlay on any cell type except obstacle
+
+                // Visualize Q-values or policy if toggled
+                if (this.showQValues && !cell.isObstacle && !(row === this.goal.row && col === this.goal.col)) {
+                    this.renderQValues(cell.element, cellStateKey);
+                }
             }
         }
         
         // Render agent (only if not on an obstacle cell)
         if (!this.grid[this.agent.row][this.agent.col].isObstacle) {
             const agentCell = this.grid[this.agent.row][this.agent.col];
-             // Ensure agent icon does not overwrite goal icon if they overlap (agent wins)
-            agentCell.element.innerHTML = '<img src="images/agent-icon.svg" alt="Agent" style="width: 80%; height: 80%; object-fit: contain;">'; 
+            // If agent is on goal, make agent slightly transparent to see goal
+            const agentStyle = (this.agent.row === this.goal.row && this.agent.col === this.goal.col) ? 'opacity: 0.7;' : '';
+            agentCell.element.innerHTML += `<img src="images/agent-icon.svg" alt="Agent" style="width: 80%; height: 80%; object-fit: contain; position: absolute; top: 10%; left: 10%; ${agentStyle}">`; 
         }
         
         // Update stats
-        // Ensure stats elements exist before updating
-        const episodesSpan = document.getElementById('episodes');
-        const stepsSpan = document.getElementById('steps');
+        const episodesSpan = document.getElementById(`gw-episodes-${this.container.id}`);
+        const stepsSpan = document.getElementById(`gw-steps-${this.container.id}`);
+        const epsilonSpan = document.getElementById(`gw-epsilon-${this.container.id}`);
         if (episodesSpan) episodesSpan.textContent = this.episodes;
         if (stepsSpan) stepsSpan.textContent = this.steps;
+        if (epsilonSpan) epsilonSpan.textContent = this.epsilon.toFixed(2);
+    }
+
+     // Function to render Q-values and policy arrows in a cell
+    renderQValues(cellElement, stateKey) {
+        const qVizContainer = document.createElement('div');
+        qVizContainer.style.position = 'absolute';
+        qVizContainer.style.top = '0'; qVizContainer.style.left = '0';
+        qVizContainer.style.width = '100%'; qVizContainer.style.height = '100%';
+        qVizContainer.style.fontSize = '8px';
+        qVizContainer.style.lineHeight = '1';
+        qVizContainer.style.display = 'flex';
+        qVizContainer.style.flexDirection = 'column';
+        qVizContainer.style.justifyContent = 'center';
+        qVizContainer.style.alignItems = 'center';
+        qVizContainer.style.pointerEvents = 'none'; // Prevent interfering with clicks
+
+        let maxQ = -Infinity;
+        let bestAction = null;
+        const actionValues = {};
+
+        this.actions.forEach(action => {
+            const qVal = this.getQValue(stateKey, action);
+            actionValues[action] = qVal;
+            if (qVal > maxQ) {
+                maxQ = qVal;
+                bestAction = action;
+            }
+        });
+
+        // Simple Q-value display (optional)
+        /*
+        Object.entries(actionValues).forEach(([action, qVal]) => {
+             const qText = document.createElement('span');
+             qText.textContent = `${action[0]}: ${qVal.toFixed(1)}`;
+             qText.style.display = 'block';
+             qVizContainer.appendChild(qText);
+        });
+        */
+
+        // Draw arrow indicating best action (policy)
+        if (bestAction && maxQ > -Infinity) { // Only draw if a best action exists
+             const arrow = document.createElement('div');
+             arrow.style.width = '0'; 
+             arrow.style.height = '0';
+             arrow.style.borderStyle = 'solid';
+             arrow.style.position = 'absolute';
+             const arrowSize = 5; // Size of the arrow head
+
+             switch(bestAction) {
+                case 'up':
+                    arrow.style.borderWidth = `0 ${arrowSize}px ${arrowSize}px ${arrowSize}px`;
+                    arrow.style.borderColor = `transparent transparent var(--accent-color) transparent`;
+                    arrow.style.top = '5px'; arrow.style.left = `calc(50% - ${arrowSize}px)`;
+                    break;
+                case 'right':
+                     arrow.style.borderWidth = `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`;
+                     arrow.style.borderColor = `transparent transparent transparent var(--accent-color)`;
+                     arrow.style.top = `calc(50% - ${arrowSize}px)`; arrow.style.right = '5px';
+                     break;
+                case 'down':
+                    arrow.style.borderWidth = `${arrowSize}px ${arrowSize}px 0 ${arrowSize}px`;
+                    arrow.style.borderColor = `var(--accent-color) transparent transparent transparent`;
+                    arrow.style.bottom = '5px'; arrow.style.left = `calc(50% - ${arrowSize}px)`;
+                     break;
+                 case 'left':
+                     arrow.style.borderWidth = `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`;
+                     arrow.style.borderColor = `transparent var(--accent-color) transparent transparent`;
+                     arrow.style.top = `calc(50% - ${arrowSize}px)`; arrow.style.left = '5px';
+                     break;
+             }
+             qVizContainer.appendChild(arrow);
+        }
+
+        cellElement.appendChild(qVizContainer);
     }
     
     startTraining() {
         this.isTraining = true;
+        // Prevent multiple intervals if start is clicked rapidly
+        if (this.trainingInterval) clearInterval(this.trainingInterval);
         this.trainingInterval = setInterval(() => {
             this.step();
-        }, 200); // Step every 200ms
+        }, this.trainingSpeed); 
     }
     
     stopTraining() {
         this.isTraining = false;
         clearInterval(this.trainingInterval);
+        this.trainingInterval = null;
     }
     
     step() {
-        // Simple random policy for demonstration
-        const actions = this.getValidActions();
-        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+        if (!this.isTraining) return;
+
+        const stateKey = `${this.agent.row},${this.agent.col}`;
         
-        // Move agent
-        this.moveAgent(randomAction);
-        
-        // Check if reached goal
-        if (this.agent.row === this.goal.row && this.agent.col === this.goal.col) {
-            this.episodes++;
-            this.resetAgent();
+        // Choose action using epsilon-greedy
+        let action;
+        if (Math.random() < this.epsilon) {
+            // Explore: choose a random valid action
+            const validActions = this.getValidActions(this.agent.row, this.agent.col);
+            action = validActions[Math.floor(Math.random() * validActions.length)];
+        } else {
+            // Exploit: choose the best known action for the current state
+            let maxQ = -Infinity;
+            let bestAction = null;
+            // Shuffle actions to break ties randomly
+            const shuffledActions = [...this.actions].sort(() => 0.5 - Math.random());
+            shuffledActions.forEach(act => {
+                const qVal = this.getQValue(stateKey, act);
+                if (qVal > maxQ) {
+                    maxQ = qVal;
+                    bestAction = act;
+                }
+            });
+            // If multiple actions have the same maxQ, bestAction will be one of them due to shuffle
+            // Fallback to random valid action if no Q-values learned yet or all are equal
+            action = bestAction || this.getValidActions(this.agent.row, this.agent.col)[0]; 
         }
+
+        // Get current Q-value
+        const currentQ = this.getQValue(stateKey, action);
+
+        // Simulate taking the action
+        const { nextRow, nextCol } = this.getNextState(this.agent.row, this.agent.col, action);
+        const nextStateKey = `${nextRow},${nextCol}`;
+        const reward = this.grid[nextRow][nextCol].reward;
+        const isDone = (nextRow === this.goal.row && nextCol === this.goal.col);
+
+        // Q-Learning Update
+        let maxNextQ = -Infinity;
+        this.actions.forEach(nextAction => {
+            maxNextQ = Math.max(maxNextQ, this.getQValue(nextStateKey, nextAction));
+        });
+        // If goal state reached, the value of the next state is 0 (no future rewards)
+        if (isDone) maxNextQ = 0;
+
+        const newQ = currentQ + this.alpha * (reward + this.gamma * maxNextQ - currentQ);
+        this.setQValue(stateKey, action, newQ);
+
+        // Move agent
+        this.agent.row = nextRow;
+        this.agent.col = nextCol;
         
         this.steps++;
+        this.stepsInEpisode++;
+
+        // Check if episode finished (reached goal or max steps)
+        if (isDone || this.stepsInEpisode >= this.maxStepsPerEpisode) {
+            this.episodes++;
+            this.resetAgent();
+            this.stepsInEpisode = 0;
+            // Decay epsilon at the end of each episode
+            this.epsilon = Math.max(this.minEpsilon, this.epsilon * this.epsilonDecay);
+        }
+        
         this.render();
     }
-    
-    getValidActions() {
-        const actions = [];
-        
-        // Check up
-        if (this.agent.row > 0 && !this.grid[this.agent.row - 1][this.agent.col].isObstacle) {
-            actions.push('up');
-        }
-        
-        // Check right
-        if (this.agent.col < this.cols - 1 && !this.grid[this.agent.row][this.agent.col + 1].isObstacle) {
-            actions.push('right');
-        }
-        
-        // Check down
-        if (this.agent.row < this.rows - 1 && !this.grid[this.agent.row + 1][this.agent.col].isObstacle) {
-            actions.push('down');
-        }
-        
-        // Check left
-        if (this.agent.col > 0 && !this.grid[this.agent.row][this.agent.col - 1].isObstacle) {
-            actions.push('left');
-        }
-        
-        return actions;
-    }
-    
-    moveAgent(action) {
+
+    // Calculates the next state coordinates without checking obstacle validity (handled by getValidActions)
+    getNextState(row, col, action) {
+        let nextRow = row;
+        let nextCol = col;
         switch (action) {
-            case 'up':
-                this.agent.row--;
-                break;
-            case 'right':
-                this.agent.col++;
-                break;
-            case 'down':
-                this.agent.row++;
-                break;
-            case 'left':
-                this.agent.col--;
-                break;
+            case 'up': nextRow = Math.max(0, row - 1); break;
+            case 'right': nextCol = Math.min(this.cols - 1, col + 1); break;
+            case 'down': nextRow = Math.min(this.rows - 1, row + 1); break;
+            case 'left': nextCol = Math.max(0, col - 1); break;
         }
+         // Prevent moving into obstacles
+        if (this.grid[nextRow] && this.grid[nextRow][nextCol] && this.grid[nextRow][nextCol].isObstacle) {
+            return { nextRow: row, nextCol: col }; // Stay in the same place if action leads to obstacle
+        }
+        return { nextRow, nextCol };
     }
+    
+    // Get valid actions from a given state (avoids obstacles)
+    getValidActions(row, col) {
+        const validActions = [];
+        
+        this.actions.forEach(action => {
+            let nextRow = row;
+            let nextCol = col;
+            switch (action) {
+                case 'up': nextRow--; break;
+                case 'right': nextCol++; break;
+                case 'down': nextRow++; break;
+                case 'left': nextCol--; break;
+            }
+
+            // Check bounds and obstacles
+            if (nextRow >= 0 && nextRow < this.rows && 
+                nextCol >= 0 && nextCol < this.cols &&
+                !this.grid[nextRow][nextCol].isObstacle) {
+                validActions.push(action);
+            }
+        });
+        
+         // Ensure there's always at least one action if possible (e.g., if surrounded but not on obstacle)
+         // This prevents errors if agent gets stuck, though ideally the environment design avoids this.
+         // A simple fallback if no valid actions found (shouldn't happen in open grid): stay put? No standard action for stay.
+         // Return valid actions, or if somehow empty, maybe return a random original action (agent will bump obstacle)
+         return validActions.length > 0 ? validActions : [this.actions[Math.floor(Math.random()*this.actions.length)]];
+    }
+    
+    // Function is not used with Q-learning logic, replaced by step()
+    /*
+    moveAgent(action) {
+        // ... (old random move logic) ...
+    }
+    */
     
     resetAgent() {
         this.agent = { row: 0, col: 0 };
+        this.stepsInEpisode = 0;
     }
     
     reset() {
+        console.log("Resetting GridWorld Demo with current parameters...");
         this.stopTraining();
-        this.resetAgent();
-        this.episodes = 0;
-        this.steps = 0;
-        this.render();
-        
-        const startButton = document.querySelector('.start-button');
-        if (startButton) {
-            startButton.textContent = 'Start Training';
-        }
+        // Re-initialize with potentially updated initial parameters
+        // Initialize will reset epsilon, alpha etc. based on initialAlpha, initialEpsilon
+        this.initialize(); 
+         const startButton = this.container.querySelector('.start-button');
+         if (startButton) startButton.textContent = 'Start Training';
     }
 }
 
-// Initialize the grid world demo when the page is fully loaded
+// Remove the old global initialization for the demo
+/*
 window.addEventListener('load', function() {
-    // Check if the demo container exists
     const demoContainer = document.getElementById('basic-rl-demo');
     if (demoContainer) {
         new GridWorldDemo('basic-rl-demo');
     }
 });
+*/

@@ -573,6 +573,53 @@ nav a:hover, nav a.active {
 .feedback { margin-top: 1rem; font-size: 0.9rem; }
 .feedback p { margin-bottom: 0.3rem; }
 
+/* Quiz Feedback Styling */
+.quiz-question.correct .question-text {
+    color: #28a745; /* Green for correct */
+}
+
+.quiz-question.incorrect .question-text {
+    color: #dc3545; /* Red for incorrect */
+}
+
+.quiz-question.correct {
+    border-left: 4px solid #28a745;
+    padding-left: 1rem;
+}
+
+.quiz-question.incorrect {
+    border-left: 4px solid #dc3545;
+    padding-left: 1rem;
+}
+
+/* Ensure quiz results feedback is styled */
+.quiz-results .feedback p {
+    margin-bottom: 0.5rem;
+}
+
+/* Placeholder Styling (Optional: for visibility during development) */
+.diagram-placeholder,
+.quiz-placeholder,
+.code-placeholder,
+.demo-placeholder {
+    display: block;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #fff3cd; /* Light yellow */
+    border: 1px dashed #ffeeba;
+    color: #856404;
+    font-family: monospace;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Style images within diagrams to prevent overriding other images */
+.diagram img {
+    /* Styles for diagram images specifically, if needed beyond .lesson-content img */
+    /* Example: remove border if added by general img style */
+     border: none; 
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -774,3 +821,143 @@ footer {
     margin: 1.5rem 0;
     border: 1px solid var(--border-color);
 }
+
+/* Chain-of-Thought Visualization Styling */
+.cot-visualization {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-alt-color);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+}
+
+.cot-prompt p {
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    color: var(--text-color);
+}
+
+.cot-steps-container {
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-color);
+}
+
+.cot-step {
+    padding: 0.5rem 0;
+    color: var(--text-secondary-color);
+    border-bottom: 1px dashed var(--border-color);
+}
+.cot-step:last-child {
+    border-bottom: none;
+}
+
+.cot-answer {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #e6f7ff; /* Light blue background */
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    color: var(--text-color);
+}
+
+.cot-answer p {
+    margin-bottom: 0;
+}
+
+.cot-controls {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.cot-button {
+    /* Reuse general button styles or define specific ones */
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.cot-button:hover {
+    background-color: var(--accent-hover-color);
+}
+
+.cot-button:disabled {
+    background-color: var(--border-color);
+    cursor: default;
+}
+
+/* Timeline Visualization Styling */
+.timeline-container {
+    margin: 3rem 0;
+}
+
+.timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    /* Create the central vertical line */
+    border-left: 2px solid var(--border-color);
+    margin-left: 10px; /* Adjust as needed to center */
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-left: 30px; /* Space for the dot and line */
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -9px; /* Position dot on the line (adjust based on line thickness and dot size) */
+    top: 0.5rem; /* Align dot vertically with text */
+    width: 16px;
+    height: 16px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    border: 3px solid var(--bg-color); /* Creates halo effect */
+}
+
+.timeline-content {
+    background-color: var(--bg-alt-color);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.timeline-year {
+    font-weight: 600;
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9em;
+}
+
+.timeline-title {
+    font-size: 1.1em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.timeline-description {
+    font-size: 0.95em;
+    color: var(--text-secondary-color);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* Optional: Alternating sides (requires adding classes in JS) */
+/*
+.timeline-item-left .timeline-content { margin-left: 40px; }
+.timeline-item-right .timeline-content { margin-right: 40px; text-align: right; }
+.timeline-item-right .timeline-dot { left: auto; right: -9px; }
+*/
+
+/* Placeholder Styling (Optional) */
