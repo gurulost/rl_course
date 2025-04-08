@@ -1,4 +1,4 @@
-## 2.2 Q-Learning Explained: Learning Action Values
+## 2.3.1 Q-Learning Explained: Learning Action Values
 
 Q-learning is one of the most fundamental and widely used model-free, off-policy reinforcement learning algorithms. It's powerful because it can learn the optimal way to act even if the agent is exploring randomly during training!
 
@@ -24,9 +24,7 @@ This is called a **greedy policy** because it always chooses the action that loo
 
 How does the agent learn the Q-values? It uses an iterative update rule based on the **Bellman equation**, which relates the value of a state-action pair to the values of possible next states. The Q-learning update happens after the agent takes an action `A_t` in state `S_t`, receives a reward `R_{t+1}`, and observes the next state `S_{t+1}`:
 
-```
-Q(S_t, A_t) ← Q(S_t, A_t) + α [ R_{t+1} + γ max_a Q(S_{t+1}, a) - Q(S_t, A_t) ]
-```
+\[ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [ R_{t+1} + \gamma \max_a Q(S_{t+1}, a) - Q(S_t, A_t) ] \]
 
 Let's break down the terms:
 
@@ -51,11 +49,4 @@ To ensure the agent explores the environment sufficiently to find the optimal Q-
 *   With probability `ε` (epsilon), the agent chooses a random action (explores).
 *   With probability `1-ε`, the agent chooses the action with the highest current Q-value for the state (exploits).
 
-Usually, `ε` starts high (e.g., 1.0) and gradually decays over time (like in our GridWorld demo), so the agent explores a lot initially and then increasingly exploits its learned knowledge as it becomes more confident in its Q-values.
-
-<!-- DIAGRAM data-diagram="q-learning-flowchart" -->
-*(Placeholder: Q-learning update loop flowchart)*
-
-Let's look at a simplified code structure:
-<div class="code-placeholder" data-example-id="q-learning-intro"></div>
-*(Placeholder: Interactive Q-learning code editor - shows basic structure)* 
+Usually, `ε` starts high (e.g., 1.0) and gradually decays over time, so the agent explores a lot initially and then increasingly exploits its learned knowledge as it becomes more confident in its Q-values. 
