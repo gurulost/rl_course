@@ -412,19 +412,28 @@ function initializeTimelineVisualization(lessonElement) {
 
 // Main function called by main.js after lesson content is loaded
 function initializeMultimodalForLesson(lessonElement) {
+    // This function is the central point for adding interactive elements
+    // after the main lesson content (Markdown) has been loaded and parsed.
+    // It finds predefined placeholder elements within the loaded HTML 
+    // (e.g., <div class="quiz-placeholder" data-quiz="...">) and replaces 
+    // them with the actual interactive components.
+
     if (!lessonElement) return;
     
+    // Log which lesson is being initialized for easier debugging.
     console.log(`Initializing multimodal content for lesson: ${lessonElement.id}`);
 
-    // Call the specific functions to find placeholders and add content
-    loadDiagramsForLesson(lessonElement);
-    addCodeExamplesForLesson(lessonElement);
-    createQuizForLesson(lessonElement);
-    initializeDemosForLesson(lessonElement);
-    initializeChartsForLesson(lessonElement);
-    initializeCoTVisualization(lessonElement);
-    initializeTimelineVisualization(lessonElement); // Initialize Timeline
+    // Call the specific initialization functions for each type of element.
+    // Each function will search for its corresponding placeholders within the lessonElement.
+    loadDiagramsForLesson(lessonElement);       // Finds data-diagram attributes
+    addCodeExamplesForLesson(lessonElement);    // Finds .code-placeholder with data-example-id
+    createQuizForLesson(lessonElement);         // Finds .quiz-placeholder with data-quiz
+    initializeDemosForLesson(lessonElement);      // Finds .demo-placeholder with data-demo
+    initializeChartsForLesson(lessonElement);     // Finds .chart-placeholder with data-chart
+    initializeCoTVisualization(lessonElement);  // Finds .cot-visualization-placeholder with data-cot-viz
+    initializeTimelineVisualization(lessonElement); // Finds .timeline-placeholder with data-timeline
 
-    // Initialize other interactive elements specific to this lesson if needed
+    // Future interactive elements would have their own initialization 
+    // function called here, searching for their specific placeholders.
 
 }

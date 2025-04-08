@@ -303,11 +303,13 @@ class GridWorldDemo {
 
     // Helper to get Q-value, defaulting to 0
     getQValue(stateKey, action) {
+        // stateKey is expected to be 'row,col'
         return this.qTable[`${stateKey}-${action}`] || 0;
     }
 
     // Helper to set Q-value
     setQValue(stateKey, action, value) {
+        // stateKey is expected to be 'row,col'
         this.qTable[`${stateKey}-${action}`] = value;
     }
     
@@ -318,7 +320,7 @@ class GridWorldDemo {
         this.episodes = 0;
         this.steps = 0;
         this.stepsInEpisode = 0;
-        // Reset parameters to initial/tuned values
+        // Reset parameters to potentially tuned initial values
         this.alpha = this.initialAlpha;
         this.epsilon = this.initialEpsilon;
         this.epsilonDecay = this.initialEpsilonDecay;
@@ -478,7 +480,7 @@ class GridWorldDemo {
         this.container.appendChild(controlsContainer);
     }
 
-    // Helper to create slider controls
+    // Helper to create slider controls with labels and value display
     createSliderControl(id, labelText, min, max, step, initialValue, onChangeCallback, displayDecimals = 2) {
         const controlDiv = document.createElement('div');
         controlDiv.style.display = 'flex';
@@ -662,20 +664,20 @@ class GridWorldDemo {
     step() {
         if (!this.isTraining) return;
 
+        // Get current state representation (e.g., "row,col")
         const stateKey = `${this.agent.row},${this.agent.col}`;
         
-        // Choose action using epsilon-greedy
+        // --- Action Selection (Epsilon-Greedy) ---
         let action;
         if (Math.random() < this.epsilon) {
-            // Explore: choose a random valid action
+            // Exploration: Choose a random valid action
             const validActions = this.getValidActions(this.agent.row, this.agent.col);
             action = validActions[Math.floor(Math.random() * validActions.length)];
         } else {
-            // Exploit: choose the best known action for the current state
+            // Exploitation: Choose the best action based on current Q-values
             let maxQ = -Infinity;
             let bestAction = null;
-            // Shuffle actions to break ties randomly
-            const shuffledActions = [...this.actions].sort(() => 0.5 - Math.random());
+            const shuffledActions = [...this.actions].sort(() => 0.5 - Math.random()); // Shuffle for tie-breaking
             shuffledActions.forEach(act => {
                 const qVal = this.getQValue(stateKey, act);
                 if (qVal > maxQ) {
@@ -683,47 +685,49 @@ class GridWorldDemo {
                     bestAction = act;
                 }
             });
-            // If multiple actions have the same maxQ, bestAction will be one of them due to shuffle
-            // Fallback to random valid action if no Q-values learned yet or all are equal
+            // Fallback if no Q-values are learned yet for this state
             action = bestAction || this.getValidActions(this.agent.row, this.agent.col)[0]; 
         }
 
-        // Get current Q-value
+        // Get current Q-value estimate for the chosen action
         const currentQ = this.getQValue(stateKey, action);
 
-        // Simulate taking the action
+        // --- Simulate action and observe outcome ---
         const { nextRow, nextCol } = this.getNextState(this.agent.row, this.agent.col, action);
         const nextStateKey = `${nextRow},${nextCol}`;
         const reward = this.grid[nextRow][nextCol].reward;
         const isDone = (nextRow === this.goal.row && nextCol === this.goal.col);
 
-        // Q-Learning Update
+        // --- Q-Learning Update Calculation ---
+        // Find the maximum Q-value for the *next* state (max_a' Q(s', a'))
         let maxNextQ = -Infinity;
         this.actions.forEach(nextAction => {
             maxNextQ = Math.max(maxNextQ, this.getQValue(nextStateKey, nextAction));
         });
-        // If goal state reached, the value of the next state is 0 (no future rewards)
+        // If the next state is the terminal/goal state, its value is 0
         if (isDone) maxNextQ = 0;
 
+        // Calculate the updated Q-value (TD Target = reward + gamma * maxNextQ)
         const newQ = currentQ + this.alpha * (reward + this.gamma * maxNextQ - currentQ);
+        // Update the Q-table
         this.setQValue(stateKey, action, newQ);
 
-        // Move agent
+        // --- Move agent and update counters ---
         this.agent.row = nextRow;
         this.agent.col = nextCol;
-        
         this.steps++;
         this.stepsInEpisode++;
 
-        // Check if episode finished (reached goal or max steps)
+        // --- Handle episode termination ---
         if (isDone || this.stepsInEpisode >= this.maxStepsPerEpisode) {
             this.episodes++;
-            this.resetAgent();
+            this.resetAgent(); // Reset agent position and episode step count
             this.stepsInEpisode = 0;
-            // Decay epsilon at the end of each episode
+            // Decay exploration rate
             this.epsilon = Math.max(this.minEpsilon, this.epsilon * this.epsilonDecay);
         }
         
+        // Re-render the grid to show the new state
         this.render();
     }
 
