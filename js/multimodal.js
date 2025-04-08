@@ -1,168 +1,79 @@
 // Create SVG diagrams for RL concepts
-function createRLProcessDiagram() {
-    return `
-    <svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-        <!-- Agent -->
-        <rect x="100" y="100" width="120" height="80" rx="10" fill="#4a6baf" />
-        <text x="160" y="145" text-anchor="middle" fill="white" font-size="18">Agent</text>
-        
-        <!-- Environment -->
-        <rect x="380" y="100" width="120" height="80" rx="10" fill="#6c63ff" />
-        <text x="440" y="145" text-anchor="middle" fill="white" font-size="18">Environment</text>
-        
-        <!-- Action Arrow -->
-        <path d="M 220 120 L 380 120" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="300" y="110" text-anchor="middle" fill="#333" font-size="14">Action</text>
-        
-        <!-- State & Reward Arrow -->
-        <path d="M 380 160 L 220 160" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="300" y="180" text-anchor="middle" fill="#333" font-size="14">State, Reward</text>
-        
-        <!-- Arrowhead marker -->
-        <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
-            </marker>
-        </defs>
-    </svg>
-    `;
-}
+/* Remove function createRLProcessDiagram() { ... } */
 
 // Create SVG for MDP diagram
-function createMDPDiagram() {
-    return `
-    <svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-        <!-- States -->
-        <circle cx="100" cy="200" r="40" fill="#4a6baf" />
-        <text x="100" y="205" text-anchor="middle" fill="white" font-size="18">S₁</text>
-        
-        <circle cx="300" cy="100" r="40" fill="#4a6baf" />
-        <text x="300" y="105" text-anchor="middle" fill="white" font-size="18">S₂</text>
-        
-        <circle cx="300" cy="300" r="40" fill="#4a6baf" />
-        <text x="300" y="305" text-anchor="middle" fill="white" font-size="18">S₃</text>
-        
-        <circle cx="500" cy="200" r="40" fill="#4a6baf" />
-        <text x="500" y="205" text-anchor="middle" fill="white" font-size="18">S₄</text>
-        
-        <!-- Transitions -->
-        <path d="M 130 175 Q 200 100 260 100" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="180" y="110" text-anchor="middle" fill="#333" font-size="14">a₁, r=1</text>
-        
-        <path d="M 130 225 Q 200 300 260 300" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="180" y="290" text-anchor="middle" fill="#333" font-size="14">a₂, r=-1</text>
-        
-        <path d="M 340 100 Q 450 100 490 170" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="420" y="110" text-anchor="middle" fill="#333" font-size="14">a₁, r=2</text>
-        
-        <path d="M 340 300 Q 450 300 490 230" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-        <text x="420" y="290" text-anchor="middle" fill="#333" font-size="14">a₁, r=1</text>
-        
-        <!-- Arrowhead marker -->
-        <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
-            </marker>
-        </defs>
-    </svg>
-    `;
-}
+/* Remove function createMDPDiagram() { ... } */
 
 // Create SVG for algorithm comparison
-function createAlgorithmComparisonChart() {
-    return `
-    <svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-        <!-- Chart background -->
-        <rect x="50" y="50" width="500" height="300" fill="#f8f9fa" stroke="#ddd" />
-        
-        <!-- Y-axis -->
-        <line x1="50" y1="50" x2="50" y2="350" stroke="#333" stroke-width="2" />
-        <text x="30" y="200" text-anchor="middle" fill="#333" font-size="14" transform="rotate(-90, 30, 200)">Performance</text>
-        
-        <!-- X-axis -->
-        <line x1="50" y1="350" x2="550" y2="350" stroke="#333" stroke-width="2" />
-        <text x="300" y="380" text-anchor="middle" fill="#333" font-size="14">Training Steps</text>
-        
-        <!-- Q-learning curve -->
-        <path d="M 50 350 C 100 300, 200 200, 300 150 C 400 120, 500 100, 550 80" stroke="#4a6baf" stroke-width="3" fill="none" />
-        <text x="570" y="80" text-anchor="start" fill="#4a6baf" font-size="14">Q-learning</text>
-        
-        <!-- SARSA curve -->
-        <path d="M 50 350 C 100 320, 200 250, 300 200 C 400 170, 500 150, 550 130" stroke="#6c63ff" stroke-width="3" fill="none" />
-        <text x="570" y="130" text-anchor="start" fill="#6c63ff" font-size="14">SARSA</text>
-        
-        <!-- Policy Gradient curve -->
-        <path d="M 50 350 C 100 340, 150 300, 200 280 C 300 200, 400 120, 550 100" stroke="#ff6584" stroke-width="3" fill="none" />
-        <text x="570" y="100" text-anchor="start" fill="#ff6584" font-size="14">Policy Gradient</text>
-    </svg>
-    `;
-}
+/* Remove function createAlgorithmComparisonChart() { ... } */
 
 // Create SVG for exploration-exploitation diagram
-function createExplorationExploitationDiagram() {
-    return `
-    <svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-        <!-- Balance scale -->
-        <line x1="300" y1="100" x2="300" y2="150" stroke="#333" stroke-width="4" />
-        <line x1="200" y1="150" x2="400" y2="150" stroke="#333" stroke-width="4" />
-        
-        <!-- Left pan (Exploration) -->
-        <path d="M 200 150 L 180 200 L 220 200 Z" fill="#4a6baf" stroke="#333" stroke-width="2" />
-        <text x="200" y="230" text-anchor="middle" fill="#333" font-size="18">Exploration</text>
-        <text x="200" y="250" text-anchor="middle" fill="#333" font-size="14">Discover new strategies</text>
-        
-        <!-- Right pan (Exploitation) -->
-        <path d="M 400 150 L 380 200 L 420 200 Z" fill="#6c63ff" stroke="#333" stroke-width="2" />
-        <text x="400" y="230" text-anchor="middle" fill="#333" font-size="18">Exploitation</text>
-        <text x="400" y="250" text-anchor="middle" fill="#333" font-size="14">Use known good strategies</text>
-        
-        <!-- Balance point -->
-        <circle cx="300" cy="100" r="10" fill="#ff6584" />
-        <text x="300" y="80" text-anchor="middle" fill="#333" font-size="18">Balance</text>
-    </svg>
-    `;
-}
+/* Remove function createExplorationExploitationDiagram() { ... } */
 
-// Function to load diagrams into the course
-function loadDiagrams() {
-    // Add RL Process Diagram to Module 1
-    const lesson1_2 = document.querySelector('#lesson1-2 .lesson-content');
-    if (lesson1_2) {
-        const rlProcessDiagram = document.createElement('div');
-        rlProcessDiagram.className = 'diagram';
-        rlProcessDiagram.innerHTML = createRLProcessDiagram();
-        rlProcessDiagram.innerHTML += '<p class="diagram-caption">Figure 1: The Reinforcement Learning Process</p>';
-        lesson1_2.appendChild(rlProcessDiagram);
+// Function to load diagrams specific to a lesson
+function loadDiagramsForLesson(lessonElement) {
+    const lessonId = lessonElement.id;
+    const contentDiv = lessonElement.querySelector('.lesson-content');
+    if (!contentDiv) return;
+
+    // Helper function to create and insert diagram images into a specific container
+    function insertDiagram(container, imagePath, captionText) {
+        // Check if diagram already added (optional, safety check)
+        // Simple check based on src might be fragile if paths change
+        if (container.querySelector(`img[src="${imagePath}"]`)) return;
+
+        const diagramDiv = document.createElement('div');
+        diagramDiv.className = 'diagram fade-in';
+        
+        const img = document.createElement('img');
+        img.src = imagePath;
+        img.alt = captionText || 'Diagram';
+        img.loading = 'lazy'; // Add lazy loading for images
+        
+        diagramDiv.appendChild(img);
+        
+        if (captionText) {
+            const caption = document.createElement('p');
+            caption.className = 'diagram-caption';
+            caption.textContent = captionText;
+            diagramDiv.appendChild(caption);
+        }
+        
+        container.appendChild(diagramDiv);
+    }
+
+    // --- Define which diagrams belong to which lessons --- 
+    // This mapping logic needs to be maintained
+    switch (lessonId) {
+        case 'lesson1-2': // Core Components of RL
+            insertDiagram(contentDiv, 'images/rl-process.svg', 'Figure 1: The Reinforcement Learning Process');
+            insertDiagram(contentDiv, 'images/mdp.svg', 'Figure 2: Markov Decision Process (MDP) Example');
+            break;
+        // Add cases for other lessons that should have diagrams
+        // case 'lessonX-Y':
+        //     insertDiagram(contentDiv, 'images/some-other-diagram.svg', 'Figure Z: ...');
+        //     break;
     }
     
-    // Add MDP Diagram to Module 1
-    const lesson1_2b = document.querySelector('#lesson1-2 .lesson-content');
-    if (lesson1_2b) {
-        const mdpDiagram = document.createElement('div');
-        mdpDiagram.className = 'diagram';
-        mdpDiagram.innerHTML = createMDPDiagram();
-        mdpDiagram.innerHTML += '<p class="diagram-caption">Figure 2: Markov Decision Process (MDP) Example</p>';
-        lesson1_2b.appendChild(mdpDiagram);
+    // Add diagrams that might belong to module-level content (if applicable)
+    // This part is tricky if content is purely lesson-based.
+    // Example: Check if this lesson belongs to module 2, then add algo comparison?
+    if (lessonElement.closest('#module2')) {
+         // Decide if this should go in *every* lesson of module 2, or just the first?
+         // Or perhaps add specific placeholder divs in Markdown? e.g., <div class="diagram-placeholder" data-diagram="algo-comparison"></div>
+         // For now, let's assume it should load if *any* lesson in module 2 is loaded.
+         // This might lead to duplicates if multiple lessons are opened. 
+         // A better approach might be needed depending on requirements.
+         const moduleContentDiv = lessonElement.closest('.module-content');
+         if (moduleContentDiv && !moduleContentDiv.querySelector('img[src="images/algo-comparison.svg"]')) { // Prevent duplicates in module
+              insertDiagram(moduleContentDiv, 'images/algo-comparison.svg', 'Figure 3: Performance Comparison of RL Algorithms');
+         }
     }
-    
-    // Add Algorithm Comparison Chart to Module 2
-    const module2Content = document.querySelector('#module2 .module-content');
-    if (module2Content) {
-        const algoComparisonChart = document.createElement('div');
-        algoComparisonChart.className = 'diagram';
-        algoComparisonChart.innerHTML = createAlgorithmComparisonChart();
-        algoComparisonChart.innerHTML += '<p class="diagram-caption">Figure 3: Performance Comparison of RL Algorithms</p>';
-        module2Content.appendChild(algoComparisonChart);
-    }
-    
-    // Add Exploration-Exploitation Diagram to Module 3
-    const module3Content = document.querySelector('#module3 .module-content');
-    if (module3Content) {
-        const explorationDiagram = document.createElement('div');
-        explorationDiagram.className = 'diagram';
-        explorationDiagram.innerHTML = createExplorationExploitationDiagram();
-        explorationDiagram.innerHTML += '<p class="diagram-caption">Figure 4: The Exploration-Exploitation Dilemma</p>';
-        module3Content.appendChild(explorationDiagram);
+    if (lessonElement.closest('#module3')) {
+         const moduleContentDiv = lessonElement.closest('.module-content');
+         if (moduleContentDiv && !moduleContentDiv.querySelector('img[src="images/exploration-exploitation.svg"]')) { // Prevent duplicates
+              insertDiagram(moduleContentDiv, 'images/exploration-exploitation.svg', 'Figure 4: The Exploration-Exploitation Dilemma');
+         }
     }
 }
 
@@ -289,76 +200,79 @@ def q_learning(env, num_episodes, alpha=0.1, gamma=0.99, epsilon=0.1):
 
 print("Q-learning algorithm ready to use!")`;
 
-// Function to add code examples
-function addCodeExamples() {
-    // Add Q-learning code example to Module 2
-    const module2Content = document.querySelector('#module2 .module-content');
-    if (module2Content) {
-        const codeContainer = document.createElement('div');
-        codeContainer.id = 'q-learning-code';
-        codeContainer.className = 'code-container';
-        module2Content.appendChild(codeContainer);
-        
-        new CodeEditor('q-learning-code', 'python', qLearningCode);
+// Function to add code examples specific to a lesson
+function addCodeExamplesForLesson(lessonElement) {
+    const lessonId = lessonElement.id;
+    const contentDiv = lessonElement.querySelector('.lesson-content');
+    if (!contentDiv) return;
+
+    // --- Define which code examples belong to which lessons ---
+    switch (lessonId) {
+        case 'lesson2-1': // Assuming Lesson 2.1 is Q-Learning
+            // Create a unique ID for the container within this lesson
+            const editorId = `code-editor-${lessonId}`;
+            // Check if it already exists
+            if (!contentDiv.querySelector(`#${editorId}`)) {
+                const codeContainer = document.createElement('div');
+                codeContainer.id = editorId;
+                codeContainer.className = 'code-container fade-in'; // Added fade-in
+                contentDiv.appendChild(codeContainer);
+                
+                // Pass the dynamically created ID to the CodeEditor
+                new CodeEditor(editorId, 'python', qLearningCode);
+            }
+            break;
+        // Add cases for other lessons with code examples
+        // case 'lessonX-Y':
+        //    ... create container and new CodeEditor() ...
+        //    break;
     }
 }
 
-// Function to create and add quiz components
-function createQuizzes() {
-    // Create a basic quiz for Module 1
-    const module1Quiz = {
-        title: "Reinforcement Learning Basics Quiz",
-        questions: [
-            {
-                question: "What is the primary goal of reinforcement learning?",
-                options: [
-                    "To classify data into categories",
-                    "To predict values based on labeled examples",
-                    "To learn optimal behavior through trial and error",
-                    "To cluster similar data points together"
-                ],
-                correctAnswer: 2
-            },
-            {
-                question: "Which of the following is NOT a core component of reinforcement learning?",
-                options: [
-                    "Agent",
-                    "Environment",
-                    "Labeled dataset",
-                    "Reward signal"
-                ],
-                correctAnswer: 2
-            },
-            {
-                question: "What does the 'policy' refer to in reinforcement learning?",
-                options: [
-                    "The rules of the environment",
-                    "The agent's strategy for choosing actions",
-                    "The reward calculation method",
-                    "The termination conditions"
-                ],
-                correctAnswer: 1
-            }
-        ]
-    };
-    
-    // Add quiz to Module 1
-    const module1Content = document.querySelector('#module1 .module-content');
-    if (module1Content) {
+// Function to create and add quizzes specific to a lesson
+function createQuizForLesson(lessonElement) {
+    const lessonId = lessonElement.id;
+    const contentDiv = lessonElement.querySelector('.lesson-content');
+    if (!contentDiv) return;
+
+    // --- Define which quizzes belong to which lessons ---
+    let quizData = null;
+    switch (lessonId) {
+        case 'lesson1-1': // Example: Put quiz at the end of Lesson 1.1
+            // Check if quiz already added
+            if (contentDiv.querySelector('.quiz-container')) return;
+
+            quizData = {
+                title: "Reinforcement Learning Basics Quiz",
+                questions: [
+                    { question: "What is the primary goal of reinforcement learning?", options: ["To classify data into categories", "To predict values based on labeled examples", "To learn optimal behavior through trial and error", "To cluster similar data points together"], correctAnswer: 2 },
+                    { question: "Which of the following is NOT a core component of reinforcement learning?", options: ["Agent", "Environment", "Labeled dataset", "Reward signal"], correctAnswer: 2 },
+                    { question: "What does the 'policy' refer to in reinforcement learning?", options: ["The rules of the environment", "The agent's strategy for choosing actions", "The reward calculation method", "The termination conditions"], correctAnswer: 1 }
+                ]
+            };
+            break;
+        // Add cases for other lessons with quizzes
+        // case 'lessonX-Y':
+        //    quizData = { ... };
+        //    break;
+    }
+
+    if (quizData) {
+        // Create and append the quiz HTML
         const quizContainer = document.createElement('div');
-        quizContainer.className = 'quiz-container';
+        quizContainer.className = 'quiz-container fade-in'; // Added fade-in
         quizContainer.innerHTML = `
-            <h3>${module1Quiz.title}</h3>
+            <h3>${quizData.title}</h3>
             <div class="quiz-questions"></div>
             <button class="submit-quiz">Submit Answers</button>
             <div class="quiz-results"></div>
         `;
-        module1Content.appendChild(quizContainer);
+        contentDiv.appendChild(quizContainer);
         
         const questionsContainer = quizContainer.querySelector('.quiz-questions');
         
         // Add questions
-        module1Quiz.questions.forEach((q, qIndex) => {
+        quizData.questions.forEach((q, qIndex) => {
             const questionElement = document.createElement('div');
             questionElement.className = 'quiz-question';
             questionElement.innerHTML = `<p class="question-text">${qIndex + 1}. ${q.question}</p>`;
@@ -366,13 +280,14 @@ function createQuizzes() {
             const optionsContainer = document.createElement('div');
             optionsContainer.className = 'question-options';
             
-            // Add options
             q.options.forEach((option, oIndex) => {
+                const optionId = `l${lessonId}_q${qIndex}_o${oIndex}`; // Unique ID per lesson instance
+                const optionName = `l${lessonId}_q${qIndex}`; // Unique name per lesson instance
                 const optionElement = document.createElement('div');
                 optionElement.className = 'option';
                 optionElement.innerHTML = `
-                    <input type="radio" id="q${qIndex}_o${oIndex}" name="q${qIndex}" value="${oIndex}">
-                    <label for="q${qIndex}_o${oIndex}">${option}</label>
+                    <input type="radio" id="${optionId}" name="${optionName}" value="${oIndex}">
+                    <label for="${optionId}">${option}</label>
                 `;
                 optionsContainer.appendChild(optionElement);
             });
@@ -381,7 +296,7 @@ function createQuizzes() {
             questionsContainer.appendChild(questionElement);
         });
         
-        // Add submit button functionality
+        // Add submit button functionality (scoped to this quiz instance)
         const submitButton = quizContainer.querySelector('.submit-quiz');
         const resultsContainer = quizContainer.querySelector('.quiz-results');
         
@@ -389,46 +304,58 @@ function createQuizzes() {
             let score = 0;
             let feedback = '';
             
-            module1Quiz.questions.forEach((q, qIndex) => {
-                const selectedOption = document.querySelector(`input[name="q${qIndex}"]:checked`);
+            quizData.questions.forEach((q, qIndex) => {
+                const optionName = `l${lessonId}_q${qIndex}`; // Use the unique name
+                const selectedOption = quizContainer.querySelector(`input[name="${optionName}"]:checked`);
+                const questionElement = questionsContainer.children[qIndex]; // Get the specific question element
+
+                // Reset previous feedback styling (optional)
+                questionElement.classList.remove('correct', 'incorrect'); 
+
                 if (selectedOption) {
                     const selectedValue = parseInt(selectedOption.value);
                     if (selectedValue === q.correctAnswer) {
                         score++;
                         feedback += `<p>Question ${qIndex + 1}: Correct!</p>`;
+                        questionElement.classList.add('correct'); // Add styling for feedback
                     } else {
                         feedback += `<p>Question ${qIndex + 1}: Incorrect. The correct answer is "${q.options[q.correctAnswer]}".</p>`;
+                        questionElement.classList.add('incorrect'); // Add styling for feedback
                     }
                 } else {
                     feedback += `<p>Question ${qIndex + 1}: Not answered.</p>`;
+                    questionElement.classList.add('incorrect'); // Mark unanswered as incorrect visually
                 }
             });
             
             resultsContainer.innerHTML = `
                 <h4>Quiz Results</h4>
-                <p>Your score: ${score}/${module1Quiz.questions.length}</p>
+                <p>Your score: ${score}/${quizData.questions.length}</p>
                 <div class="feedback">${feedback}</div>
             `;
+            resultsContainer.style.display = 'block'; // Ensure results are visible
         });
     }
 }
 
-// Function to initialize all multimodal content
-function initMultimodalContent() {
-    // Load SVG diagrams
-    loadDiagrams();
+// Main function called by main.js after lesson content is loaded
+function initializeMultimodalForLesson(lessonElement) {
+    if (!lessonElement) return;
     
-    // Add code examples
-    addCodeExamples();
-    
-    // Create quizzes
-    createQuizzes();
-    
-    console.log('Multimodal content initialized');
+    console.log(`Initializing multimodal content for lesson: ${lessonElement.id}`);
+
+    // Call the specific functions to add content relevant to this lesson
+    loadDiagramsForLesson(lessonElement);
+    addCodeExamplesForLesson(lessonElement);
+    createQuizForLesson(lessonElement);
+
+    // Initialize other interactive elements specific to this lesson if needed
+    // e.g., find a placeholder in the loaded Markdown and activate a specific JS component
+
 }
 
-// Add to the main initialization
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize multimodal content when the page loads
-    initMultimodalContent();
-});
+// --- Remove the old initialization logic --- 
+/*
+function initMultimodalContent() { ... }
+document.addEventListener('DOMContentLoaded', function() { ... });
+*/
